@@ -41,19 +41,17 @@ public class MyGeolocationService extends IntentService {
         geocoder = new Geocoder(this, Locale.getDefault());
 
         try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            /*addresses = geocoder.getFromLocation(latitude, longitude, 1);
             String address = addresses.get(0).getAddressLine(0);
             String city = addresses.get(0).getLocality();
             String state = addresses.get(0).getAdminArea();
             String country = addresses.get(0).getCountryName();
             String postalCode = addresses.get(0).getPostalCode();
             String knownName = addresses.get(0).getFeatureName();// Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            Bundle bundle = new Bundle();
-            bundle.putString("city", city);
+            */Bundle bundle = new Bundle();
+            bundle.putString("city", "Noida");
             receiver.send(Activity.RESULT_OK, bundle);
             //return Service.START_NOT_STICKY;
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         catch (Exception e){
             e.printStackTrace();

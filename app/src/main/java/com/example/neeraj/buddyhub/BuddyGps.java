@@ -20,11 +20,14 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.List;
+
+import static android.content.Context.LOCATION_SERVICE;
+
 /**
  * Created by ankit.garg on 9/21/2017.
  */
-public class BuddyGps extends Service implements LocationListener {
-
+public class BuddyGps  implements LocationListener {
 
     private Context mContext;
 
@@ -88,18 +91,19 @@ public class BuddyGps extends Service implements LocationListener {
                         if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext,
                                 Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-                           Toast.makeText(this,"It is required for App function",Toast.LENGTH_SHORT).show();
+                           Toast.makeText(mContext,"It is required for App function",Toast.LENGTH_SHORT).show();
 
                         } else {
 
-                            ActivityCompat.requestPermissions((Activity) mContext,
+                            ActivityCompat.requestPermissions((Activity)mContext,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_PERMISSIONS_REQUEST_LOCATION);
+                            /*ActivityCompat.requestPermissions((Activity) mContext,
                                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                                     MY_PERMISSIONS_REQUEST_LOCATION
-                            );
+                            );*/
                        }
                     }
                     else{
-                        location=locatioExtractor();
+                        locatioExtractor();
                     }
                 }
 
@@ -116,53 +120,50 @@ return location;
 
 }
 
-    public  Location onRequestPermissionsResult(int requestCode,
-                                               String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    location=locatioExtractor();
-                   // return location;
-                } else {
 
 
-                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
-                }
 
-            }
-
-
-        }
-        return location;
-    }
-
-    public Location locatioExtractor(){
+    public void locatioExtractor(){
         if (ActivityCompat.checkSelfPermission((Activity)mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission((Activity)mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
+            Toast.makeText(mContext, "permission denied", Toast.LENGTH_LONG).show();
         }
         else{
+            List<String> providers = locationManager.getProviders(true);
+            Location bestLocation = null;
             locationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER,
                     MIN_TIME_BW_UPDATES,
                     MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
             Log.d("Network", "Network");
             if (locationManager != null) {
-                location = locationManager
-                        .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                if (location != null) {
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
+                for (String provider : providers) {
+                    Location l = locationManager.getLastKnownLocation(provider);
+
+                    if (l == null) {
+                        continue;
+                    }
+                    if (bestLocation == null
+                            || l.getAccuracy() < bestLocation.getAccuracy()) {
+
+                        bestLocation = l;
+                    }
+                }
+                if (bestLocation != null) {
+                    ((MainActivity)this.mContext).processingAfterLocation(bestLocation);
                 }
             }
+
+
         }
-        return location;
+
+        //((MainActivity)this.mContext).processingAfterLocation(location);
     }
+
+
 
     @Override
     public void onLocationChanged(Location location) {
-
+        ((MainActivity)this.mContext).processingAfterLocation(location);
     }
 
     @Override
@@ -180,8 +181,5 @@ return location;
 
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+
 }
