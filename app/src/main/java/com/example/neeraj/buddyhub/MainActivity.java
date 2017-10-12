@@ -317,11 +317,7 @@ public class MainActivity extends AppCompatActivity {
                     cityObj.setCity_image(url);
                     listdata.add(cityObj);
                 }
-                Iterator iterator=listdata.iterator();
-                while (iterator.hasNext()){
-                    JSONObject jsonObject= (JSONObject) iterator.next();
-
-                }
+               
 
 
 
