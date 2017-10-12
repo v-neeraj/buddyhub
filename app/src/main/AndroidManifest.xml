@@ -23,9 +23,7 @@
         </activity>
         <activity android:name=".MainActivity" />
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAFw12q5yd15CCnfkLw3rjzWCYQbq2HS-g" />
+
 
         <service
             android:name=".MyGeolocationService"

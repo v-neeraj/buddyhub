@@ -1,13 +1,16 @@
 package com.example.neeraj.buddyhub;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -36,7 +39,17 @@ public class Areacardviewadapter extends RecyclerView.Adapter<Areacardviewadapte
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
           holder.house_bhk.setText(Properties.get(position).getHouse_bhk());
-        Picasso.with(context).load(Properties.get(position).getHouse_image()).placeholder(R.drawable.ppp).fit().centerInside().into(holder.house_image);
+        Picasso.Builder builder=new Picasso.Builder(context);
+        builder.listener(new Picasso.Listener()
+        {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
+            {
+                exception.printStackTrace();
+            }
+        });
+        builder.build().load(Properties.get(position).getHouse_image()).placeholder(R.drawable.ppp).into(holder.house_image);
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{

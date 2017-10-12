@@ -149,7 +149,7 @@ return location;
                     }
                 }
                 if (bestLocation != null) {
-                    ((MainActivity)this.mContext).processingAfterLocation(bestLocation);
+                    //((MainActivity)this.mContext).processingAfterLocation(bestLocation);
                 }
             }
 
@@ -163,7 +163,7 @@ return location;
 
     @Override
     public void onLocationChanged(Location location) {
-        ((MainActivity)this.mContext).processingAfterLocation(location);
+        //((MainActivity)this.mContext).processingAfterLocation(location);
     }
 
     @Override

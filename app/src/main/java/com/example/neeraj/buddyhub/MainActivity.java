@@ -10,6 +10,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -20,11 +22,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -45,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import okhttp3.Call;
@@ -65,32 +72,12 @@ public class MainActivity extends AppCompatActivity {
     public static final String MY_PREFS_NAME="City";
     MyResultReceiver resultReceiver;
     public  Context mcontext=this;
+    Handler mHandler;
+    HandlerThread mHandlerThread;
+    PlacesAutoCompleteAdapter placesAutoCompleteAdapter;
+    private static String TAG = MainActivity.class.getSimpleName();
     public static  ArrayList listdata;
-    private final String city_names[] = {
-            "Donut",
-            "Eclair",
-            "Froyo",
-            "Gingerbread",
-            "Honeycomb",
-            "Ice Cream Sandwich",
-            "Jelly Bean",
-            "KitKat",
-            "Lollipop",
-            "Marshmallow"
-    };
 
-    private final String city_image_urls[] = {
-            "http://api.learn2crack.com/android/images/donut.png",
-            "http://api.learn2crack.com/android/images/eclair.png",
-            "http://api.learn2crack.com/android/images/froyo.png",
-            "http://api.learn2crack.com/android/images/ginger.png",
-            "http://api.learn2crack.com/android/images/honey.png",
-            "http://api.learn2crack.com/android/images/icecream.png",
-            "http://api.learn2crack.com/android/images/jellybean.png",
-            "http://api.learn2crack.com/android/images/kitkat.png",
-            "http://api.learn2crack.com/android/images/lollipop.png",
-            "http://api.learn2crack.com/android/images/marshmallow.png"
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         spinnerk.setVisibility(View.GONE);
         spinner = (ProgressBar)findViewById(R.id.progressBar);
         spinner.setVisibility(View.VISIBLE);
+        ProfileFragment();
         whenAsynchronousGetRequest_thenCorrect();
     }
 
@@ -196,49 +184,20 @@ public class MainActivity extends AppCompatActivity {
        }
 
     }
-    public void processingAfterLocation(Location location) {
-        Intent intent=new Intent(this,MyGeolocationService.class);
-        intent.putExtra("reciever", new ResultReceiver(new Handler()) {
-            @Override
-            protected void onReceiveResult(int resultCode, Bundle resultData) {
-                super.onReceiveResult(resultCode, resultData);
+    public void processingAfterLocation() {
 
-                if (resultCode == Activity.RESULT_OK) {
-                    String val = resultData.getString("city");
-                    if(listdata.contains(val)){
-                       // Spinner spinnerk=(Spinner)findViewById(R.id.spinner1);
+                        // Spinner spinnerk=(Spinner)findViewById(R.id.spinner1);
                         //ArrayAdapter adapter=new ArrayAdapter(mcontext,R.layout.support_simple_spinner_dropdown_item, (List) listdata);
                         //adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                        // spinnerk.setAdapter(adapter);
                         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.card_recycler_view);
                         recyclerView.setHasFixedSize(true);
-                        final ArrayList cities = prepareData();
+                        final ArrayList cities = listdata;
                         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
                         listAdapter.RecyclerViewClickListener lss=new listAdapter.RecyclerViewClickListener() {
                             @Override
                             public void onClick(View view, int position) {
                                 Log.d("a","a");
-                                PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                                        getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-
-                                AutocompleteFilter typeFilter = new AutocompleteFilter.Builder().setCountry("IN")
-                                        .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
-                                        .build();
-                                autocompleteFragment.setFilter(typeFilter);
-
-                                autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-                                    @Override
-                                    public void onPlaceSelected(Place place) {
-                                        // TODO: Get info about the selected place.
-                                        Log.i("pp", "Place: " + place.getName());//get place details here
-                                    }
-
-                                    @Override
-                                    public void onError(Status status) {
-                                        // TODO: Handle the error.
-                                        Log.i("pp", "An error occurred: " + status);
-                                    }
-                                });
                                 cities cityObj = new cities();
                                 cityObj= (com.example.neeraj.buddyhub.cities) cities.get(position);
                                 String city=cityObj.getCity_name();
@@ -249,46 +208,93 @@ public class MainActivity extends AppCompatActivity {
                                 spinnerk.setAdapter(adapter);
                             }
                         };
+                        AutoCompleteTextView autocompleteView = (AutoCompleteTextView) findViewById(R.id.autocomplete);
+                        autocompleteView.setThreshold(1);
+                        placesAutoCompleteAdapter=new PlacesAutoCompleteAdapter(mcontext, R.layout.autocomplete_list_view);
+                        autocompleteView.setAdapter(placesAutoCompleteAdapter);
+                        autocompleteView.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                final String type=charSequence.toString();
+                                mHandler.removeCallbacksAndMessages(null);
+                                mHandler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        CityPlacesApi placeAPI=new CityPlacesApi();
+
+                                        placesAutoCompleteAdapter.resultList =placeAPI.autocomplete(type);
+                                        mHandler.sendEmptyMessage(1);
+                                    }
+                                },500);
+
+
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+
+                            }
+                        });
+                        autocompleteView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                // Get data associated with the specified position
+                                // in the list (AdapterView)
+                                String description = (String) parent.getItemAtPosition(position);
+                                Toast.makeText(mcontext, description, Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         recyclerView.setLayoutManager(layoutManager);
 
 
                         listAdapter myadapter = new listAdapter(getApplicationContext(),cities,lss);
                         recyclerView.setAdapter(myadapter);
-                    }
-                    else{
-                       // Spinner spinnerk=(Spinner)findViewById(R.id.spinner1);
-                        //ArrayAdapter adapter=new ArrayAdapter(mcontext,R.layout.support_simple_spinner_dropdown_item, (List) listdata);
-                        //adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
 
-                       // spinnerk.setAdapter(adapter);
-                        //int a=listdata.indexOf("Noida");
-                        //spinnerk.setSelection(a);
-                    }
-                } else {
-                    Toast.makeText(mcontext,"Some Error",Toast.LENGTH_SHORT);
-                }
-            }
-        });
 
-        intent.putExtra("lat",location.getLatitude());
+
+
+
+        /*intent.putExtra("lat",location.getLatitude());
         intent.putExtra("long",location.getLongitude());
-        startService(intent);
+        startService(intent);*/
         Log.d("aa","ss");
 
 
     }
-    private ArrayList prepareData(){
 
-        ArrayList cities = new ArrayList<>();
-        for(int i=0;i<city_names.length;i++){
-            cities cityObj = new cities();
-            cityObj.setCity_name(city_names[i]);
-            cityObj.setCity_image(city_image_urls[i]);
-            cities.add(cityObj);
-        }
-        return cities;
-    }
+    public void ProfileFragment() {
+        // Required empty public constructor
+
+        if (mHandler == null) {
+            // Initialize and start the HandlerThread
+            // which is basically a Thread with a Looper
+            // attached (hence a MessageQueue)
+            mHandlerThread = new HandlerThread(TAG, android.os.Process.THREAD_PRIORITY_BACKGROUND);
+            mHandlerThread.start();
+
+            // Initialize the Handler
+            mHandler = new Handler(mHandlerThread.getLooper()) {
+                @Override
+                public void handleMessage(Message msg) {
+                    if (msg.what == 1) {
+                        ArrayList<String> results = placesAutoCompleteAdapter.resultList;
+
+                        if (results != null && results.size() > 0) {
+                            placesAutoCompleteAdapter.notifyDataSetChanged();
+                        }
+                        else {
+                            placesAutoCompleteAdapter.notifyDataSetInvalidated();
+                        }
+                    }
+                }
+            };}}
+
+
     public void setselectList(){
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
         String restoredText = prefs.getString("CityObj", null);
@@ -298,19 +304,34 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 JSONObject obj = new JSONObject(restoredText);
+
                 JSONObject obj2=obj.getJSONObject("data");
                 JSONArray arr = obj2.getJSONArray("cities");
-                 listdata = new ArrayList<String>();
-
-                if (arr != null) {
-                    for (int i=0;i<arr.length();i++){
-                        listdata.add(arr.getString(i));
-                    }
+                listdata = new ArrayList<>();
+                for (int i=0;i<arr.length();i++){
+                    JSONObject jsonObject= (JSONObject) arr.get(i);
+                    String url= (String) jsonObject.get("url");
+                    String city= (String) jsonObject.get("name");
+                    cities cityObj = new cities();
+                    cityObj.setCity_name(city);
+                    cityObj.setCity_image(url);
+                    listdata.add(cityObj);
                 }
+                Iterator iterator=listdata.iterator();
+                while (iterator.hasNext()){
+                    JSONObject jsonObject= (JSONObject) iterator.next();
+
+                }
+
+
+
+
+
+                processingAfterLocation();
                 //List<String> wordList = new ArrayList<String>(Arrays.asList(arr));
 
-                BuddyGps bps=new BuddyGps(this);
-                Location lc=bps.getLocation();
+                /*BuddyGps bps=new BuddyGps(this);
+                Location lc=bps.getLocation();*/
 
 
             } catch (JSONException e) {
