@@ -1,9 +1,13 @@
 package com.example.neeraj.buddyhub;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -46,7 +50,15 @@ public class SearchActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(80));
-        Areacardviewadapter areacardviewadapter=new Areacardviewadapter(getApplicationContext(),property);
+         Areacardviewadapter.RecyclerViewCardClickListener recyclerViewCardClickListener=new Areacardviewadapter.RecyclerViewCardClickListener() {
+         @Override
+         public void onClick(View v, int position) {
+             Log.d("a","a");
+             Intent intent=new Intent(SearchActivity.this,Property_Description.class);
+             startActivity(intent);
+         }
+          };
+        Areacardviewadapter areacardviewadapter=new Areacardviewadapter(getApplicationContext(),property,recyclerViewCardClickListener);
         recyclerView.setAdapter(areacardviewadapter);
 
     }

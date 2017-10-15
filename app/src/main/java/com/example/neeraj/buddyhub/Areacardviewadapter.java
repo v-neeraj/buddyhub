@@ -24,16 +24,21 @@ public class Areacardviewadapter extends RecyclerView.Adapter<Areacardviewadapte
 
     private Context context;
     private ArrayList<property> Properties;
+    private RecyclerViewCardClickListener mlistener;
+    public interface RecyclerViewCardClickListener{
+         void onClick(View v,int position);
+    }
 
-    public Areacardviewadapter(Context context, ArrayList<property> properties) {
+    public Areacardviewadapter(Context context, ArrayList<property> properties,RecyclerViewCardClickListener mlistener) {
         this.context = context;
         this.Properties = properties;
+        this.mlistener=mlistener;
     }
     @Override
     public Areacardviewadapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.home_searchpage,parent,false);
 
-        return new ViewHolder(view);
+        return new ViewHolder(view,mlistener);
     }
 
     @Override
@@ -52,13 +57,23 @@ public class Areacardviewadapter extends RecyclerView.Adapter<Areacardviewadapte
 
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
        TextView house_bhk;
         ImageView house_image;
-        public ViewHolder(View itemView) {
+        private RecyclerViewCardClickListener mlistener;
+        public ViewHolder(View itemView,RecyclerViewCardClickListener listener) {
             super(itemView);
             house_bhk = (TextView)itemView.findViewById(R.id.house_bhk);
             house_image = (ImageView)itemView.findViewById(R.id.img_home);
+            mlistener=listener;
+            itemView.setOnClickListener(this);
+        }
+
+
+
+        @Override
+        public void onClick(View view) {
+            mlistener.onClick(view, getAdapterPosition());
         }
     }
 

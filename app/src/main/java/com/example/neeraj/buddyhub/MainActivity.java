@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     SharedPreferences sharedpreferences;
+    Boolean check=false;
     private ProgressBar spinner;
     private Spinner spinnerk;
     public static final String MY_PREFS_NAME="City";
@@ -77,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
     PlacesAutoCompleteAdapter placesAutoCompleteAdapter;
     private static String TAG = MainActivity.class.getSimpleName();
     public static  ArrayList listdata;
+    public long delay = 1000; // 1 seconds after user stops typing
+    public long last_text_edit = 0;
 
 
     @Override
@@ -225,10 +228,15 @@ public class MainActivity extends AppCompatActivity {
                                 mHandler.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        CityPlacesApi placeAPI=new CityPlacesApi();
+                                        if(check==false){
+                                            check=true;
+                                            CityPlacesApi placeAPI=new CityPlacesApi();
+                                            placesAutoCompleteAdapter.resultList =placeAPI.autocomplete(type);
+                                            check=false;
+                                            mHandler.sendEmptyMessage(1);
 
-                                        placesAutoCompleteAdapter.resultList =placeAPI.autocomplete(type);
-                                        mHandler.sendEmptyMessage(1);
+                                        }
+
                                     }
                                 },500);
 
@@ -240,15 +248,7 @@ public class MainActivity extends AppCompatActivity {
 
                             }
                         });
-                        autocompleteView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                // Get data associated with the specified position
-                                // in the list (AdapterView)
-                                String description = (String) parent.getItemAtPosition(position);
-                                Toast.makeText(mcontext, description, Toast.LENGTH_SHORT).show();
-                            }
-                        });
+
                         recyclerView.setLayoutManager(layoutManager);
 
 
@@ -294,6 +294,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             };}}
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandlerThread.quit();
+        }
+    }
 
     public void setselectList(){
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
@@ -317,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
                     cityObj.setCity_image(url);
                     listdata.add(cityObj);
                 }
-               
+
 
 
 

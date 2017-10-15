@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".MainActivity">
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"/>
+
+            <RelativeLayout
+                android:layout_width="340dp"
+                android:layout_centerHorizontal="true"
+                android:layout_height="wrap_content"
+
+                android:layout_below="@+id/viewpager"
+                android:background="@drawable/rectangle_boundary"
+
+                android:elevation="2dp"
+                >
+
+                <TextView
+                    android:id="@+id/house_name_mainPage"
+                    android:layout_width="212dp"
+                    android:layout_height="wrap_content"
+                    android:text="Studio Independent House"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+
+                <TextView
+                    android:id="@+id/house_area_mainPage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/house_name_mainPage"
+                    android:padding="10dp"
+                    android:text="Jeevan Bima Nagar"
+                    android:textSize="14sp" />
+
+                <TableLayout
+                    android:layout_width="320dp"
+                    android:layout_height="300dp"
+                    android:layout_marginTop="23dp"
+                    android:layout_below="@+id/house_area_mainPage"
+                    android:layout_centerHorizontal="true"
+                    android:stretchColumns="*">
+
+                    <TableRow>
+                        <TextView
+                            android:background="@drawable/rectangle_boundary"
+                            android:text="From Rs\n 5000"
+                            android:padding="10dp"
+                            android:layout_width="150dp"
+                            android:layout_span="1"
+                            android:layout_height="60dp"
+                            android:gravity="center"
+                            />
+
+                        <TextView
+                            android:layout_width="150dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/rectangle_boundary"
+                            android:inputType="textMultiLine"
+                            android:layout_span="1"
+                            android:padding="10dp"
+                            android:gravity="center"
+                            android:text="Security Deposit Rs 15000"
+
+                            />
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:background="@drawable/rectangle_boundary"
+                            android:text="Room1- 2 Beds are available\nRoom2- 1 Bed is available"
+                            android:padding="20dp"
+                            android:layout_span="2"
+                            android:layout_height="wrap_content"
+                            android:maxLines="4"
+
+                            />
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:background="@drawable/rectangle_boundary"
+                            android:text="Tv,Cable,Wifi"
+                            android:padding="20dp"
+                            android:layout_span="2"
+                            android:layout_height="wrap_content"
+                            android:maxLines="4"
+                            />
+                    </TableRow>
+
+
+
+
+
+                </TableLayout>
+            </RelativeLayout>
+
+
+
+        </RelativeLayout>
+    </ScrollView>
+    <RelativeLayout
+        android:id="@+id/footer"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:background="#E827A5"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:id="@+id/texthere2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Buy Now"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+</RelativeLayout>

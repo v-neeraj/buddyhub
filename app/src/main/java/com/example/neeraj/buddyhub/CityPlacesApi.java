@@ -36,7 +36,8 @@ public class CityPlacesApi {
         try {
             StringBuilder sb = new StringBuilder(PLACES_API_BASE + TYPE_AUTOCOMPLETE + OUT_JSON);
             sb.append("?key=" + API_KEY);
-            sb.append("&types=(cities)");
+            sb.append("&components=country:ind");
+            sb.append("&types=address");
             sb.append("&input=" + URLEncoder.encode(input, "utf8"));
 
             URL url = new URL(sb.toString());
