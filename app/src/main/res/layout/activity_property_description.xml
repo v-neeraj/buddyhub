@@ -115,7 +115,7 @@
         android:id="@+id/footer"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
-        android:background="#E827A5"
+        android:background="#FF3377"
         android:layout_alignParentBottom="true">
 
         <TextView

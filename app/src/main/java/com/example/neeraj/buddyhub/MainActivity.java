@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     public static  ArrayList listdata;
     public long delay = 1000; // 1 seconds after user stops typing
     public long last_text_edit = 0;
+    public static Message m;
 
 
     @Override
@@ -276,21 +277,37 @@ public class MainActivity extends AppCompatActivity {
             // attached (hence a MessageQueue)
             mHandlerThread = new HandlerThread(TAG, android.os.Process.THREAD_PRIORITY_BACKGROUND);
             mHandlerThread.start();
+            //Thread c = Thread.currentThread();
 
             // Initialize the Handler
             mHandler = new Handler(mHandlerThread.getLooper()) {
                 @Override
-                public void handleMessage(Message msg) {
-                    if (msg.what == 1) {
-                        ArrayList<String> results = placesAutoCompleteAdapter.resultList;
+                public void handleMessage(final Message msg) {
 
-                        if (results != null && results.size() > 0) {
-                            placesAutoCompleteAdapter.notifyDataSetChanged();
+                    final int whatvar = msg.what;
+
+
+
+                    MainActivity.this.runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+
+                            if (whatvar == 1) {
+                                ArrayList<String> results = placesAutoCompleteAdapter.resultList;
+
+                                if (results != null && results.size() > 0) {
+                                    placesAutoCompleteAdapter.notifyDataSetChanged();
+                                }
+                                else {
+
+                                    placesAutoCompleteAdapter.notifyDataSetInvalidated();
+                                }
+                            }
                         }
-                        else {
-                            placesAutoCompleteAdapter.notifyDataSetInvalidated();
-                        }
-                    }
+                    });
+
+
                 }
             };}}
 

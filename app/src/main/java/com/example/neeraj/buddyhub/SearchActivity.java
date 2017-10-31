@@ -1,6 +1,7 @@
 package com.example.neeraj.buddyhub;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,9 +48,10 @@ public class SearchActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.card_recycler_view);
         recyclerView.setHasFixedSize(true);
         final ArrayList property = prepareData();
-        RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.VERTICAL,false);
+        LinearLayoutManager layoutManager=new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(80));
+
          Areacardviewadapter.RecyclerViewCardClickListener recyclerViewCardClickListener=new Areacardviewadapter.RecyclerViewCardClickListener() {
          @Override
          public void onClick(View v, int position) {
@@ -58,9 +60,49 @@ public class SearchActivity extends AppCompatActivity {
              startActivity(intent);
          }
           };
-        Areacardviewadapter areacardviewadapter=new Areacardviewadapter(getApplicationContext(),property,recyclerViewCardClickListener);
+        final Areacardviewadapter areacardviewadapter=new Areacardviewadapter(getApplicationContext(),property,recyclerViewCardClickListener);
+      // areacardviewadapter.set
         recyclerView.setAdapter(areacardviewadapter);
+        recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, final RecyclerView view) {
+                final int pages=7;
+                final int curSize=areacardviewadapter.getItemCount();
+                if(page<pages){
 
+                    Handler mHandler = new Handler();
+                    property.add(null);
+                    areacardviewadapter.notifyItemInserted(property.size()-1);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            property propertyObj = new property();
+                            property.remove(property.size()-1);
+                            for(int j=0;j<3;j++){
+                                propertyObj.setHouse_image("https://api.learn2crack.com/android/images/donut.png");
+                                propertyObj.setHouse_bhk("aaa");
+                                property.add(propertyObj);
+                            }
+
+
+
+                            view.post(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    areacardviewadapter.notifyItemRangeInserted(curSize, property.size() - 1);
+                                }
+                            });
+
+                        }
+                    },5000);
+
+
+                }
+
+            }
+
+    });
     }
     private ArrayList prepareData(){
 
