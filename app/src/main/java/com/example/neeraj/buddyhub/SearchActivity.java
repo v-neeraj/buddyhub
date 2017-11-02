@@ -67,8 +67,9 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onLoadMore(int page, int totalItemsCount, final RecyclerView view) {
                 final int pages=7;
-                final int curSize=areacardviewadapter.getItemCount();
+
                 if(page<pages){
+                    EndlessScrollListener.isloading = true;
 
                     Handler mHandler = new Handler();
                     property.add(null);
@@ -89,8 +90,10 @@ public class SearchActivity extends AppCompatActivity {
                             view.post(new Runnable() {
                                 @Override
                                 public void run() {
+                                    final int curSize=areacardviewadapter.getItemCount();
 
                                     areacardviewadapter.notifyItemRangeInserted(curSize, property.size() - 1);
+                                    EndlessScrollListener.isloading = false;
                                 }
                             });
 

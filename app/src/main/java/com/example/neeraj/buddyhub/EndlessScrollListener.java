@@ -20,6 +20,7 @@ public abstract class EndlessScrollListener extends RecyclerView.OnScrollListene
     private boolean loading = true;
     // Sets the starting page index
     private int startingPageIndex = 0;
+    public static boolean isloading = false;
 
     RecyclerView.LayoutManager mLayoutManager;
 
@@ -35,6 +36,8 @@ public abstract class EndlessScrollListener extends RecyclerView.OnScrollListene
     // but first we check if we are waiting for the previous load to finish.
     @Override
     public void onScrolled(RecyclerView view, int dx, int dy) {
+        if(isloading == true)
+            return;
         int lastVisibleItemPosition = 0;
         int totalItemCount = mLayoutManager.getItemCount();
             lastVisibleItemPosition = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
