@@ -1,5 +1,6 @@
 package com.example.neeraj.buddyhub;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.io.IOException;
@@ -16,10 +17,17 @@ import okhttp3.Response;
 
 public class httpCalls {
 
+    private Context mcontext;
+
+    public httpCalls(Context context){
+        this.mcontext=context;
+    }
+
     public void whenAsynchronousGetRequest_thenCorrect() {
+        String api=mcontext.getResources().getString(R.string.base_api);
         OkHttpClient httpClient=new OkHttpClient();
         Request request = new Request.Builder()
-                .url("http://52.77.1.30:8000/fetchdata/getcitylist")
+                .url(api+"fetchdata/getcitylist")
                 .build();
 
         Call call = httpClient.newCall(request);

@@ -64,7 +64,7 @@ public class Areacardviewadapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     exception.printStackTrace();
                 }
             });
-            builder.build().load(Properties.get(position).getHouse_image()).fit().placeholder(R.drawable.ppp).into(userViewHolder.house_image);
+            builder.build().load(Properties.get(position).getHouse_image()).fit().centerCrop().skipMemoryCache().placeholder(R.drawable.ppp).into(userViewHolder.house_image);
         }
         else{
             LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;

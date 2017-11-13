@@ -2,7 +2,11 @@
     <string name="app_name">BuddyHub</string>
     <string name="action_settings">Settings</string>
     <color name="green">#FFFFFF</color>
-
+    <string name="drawer_closed">Drawer Closed</string>
+    <string name="drawer_open">Drawer Open</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="titlename">BuddyHub</string>
+    <string name="base_api">http://52.77.1.30:8000/</string>
+
 </resources>

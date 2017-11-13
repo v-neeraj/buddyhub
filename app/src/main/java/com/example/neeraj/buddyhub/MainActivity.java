@@ -25,12 +25,14 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -66,6 +68,17 @@ import static java.security.AccessController.getContext;
 public class MainActivity extends AppCompatActivity {
 
 
+  /*  @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            View view = getCurrentFocus();
+            if (view != null && view instanceof AutoCompleteTextView) {
+               view.clearFocus();
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }*/
+
     SharedPreferences sharedpreferences;
     Boolean check=false;
     private ProgressBar spinner;
@@ -96,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         spinner.setVisibility(View.VISIBLE);
         ProfileFragment();
         whenAsynchronousGetRequest_thenCorrect();
+
     }
 
     public void  checkForDataStorage(){
@@ -137,9 +151,11 @@ public class MainActivity extends AppCompatActivity {
 
        if(activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting()){
+           String api=getResources().getString(R.string.base_api);
+
            OkHttpClient httpClient=new OkHttpClient();
            final Request request = new Request.Builder()
-                   .url("http://52.77.1.30:8000/fetchdata/getcitylist")
+                   .url(api+"fetchdata/getcitylist")
                    .build();
 
            Call call = httpClient.newCall(request);
@@ -201,21 +217,37 @@ public class MainActivity extends AppCompatActivity {
                         listAdapter.RecyclerViewClickListener lss=new listAdapter.RecyclerViewClickListener() {
                             @Override
                             public void onClick(View view, int position) {
-                                Log.d("a","a");
+
                                 cities cityObj = new cities();
                                 cityObj= (com.example.neeraj.buddyhub.cities) cities.get(position);
                                 String city=cityObj.getCity_name();
                                  spinnerk=(Spinner)findViewById(R.id.spinner1);
-                                ArrayAdapter adapter=new ArrayAdapter(mcontext,R.layout.support_simple_spinner_dropdown_item, (List) listdata);
+                                /*ArrayAdapter adapter=new ArrayAdapter(mcontext,R.layout.support_simple_spinner_dropdown_item, (List) listdata);
                                 adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
                                 spinnerk.setVisibility(View.VISIBLE);
-                                spinnerk.setAdapter(adapter);
+                                spinnerk.setAdapter(adapter);*/
                             }
                         };
-                        AutoCompleteTextView autocompleteView = (AutoCompleteTextView) findViewById(R.id.autocomplete);
+                        final AutoCompleteTextView autocompleteView = (AutoCompleteTextView) findViewById(R.id.autocomplete);
                         autocompleteView.setThreshold(1);
                         placesAutoCompleteAdapter=new PlacesAutoCompleteAdapter(mcontext, R.layout.autocomplete_list_view);
                         autocompleteView.setAdapter(placesAutoCompleteAdapter);
+
+       /*autocompleteView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                View v=(Button)findViewById(R.id.search);
+                if (!b)
+                    v.setVisibility(View.VISIBLE);
+                else{
+
+                    v.setVisibility(View.GONE);
+                }
+            }
+
+        });*/
+
+
                         autocompleteView.addTextChangedListener(new TextWatcher() {
                             @Override
                             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

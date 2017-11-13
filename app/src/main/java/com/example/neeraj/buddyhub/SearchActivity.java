@@ -26,6 +26,7 @@ public class SearchActivity extends AppCompatActivity {
             "KitKat",
             "Lollipop",
             "Marshmallow"
+
     };
 
     private final String city_image_urls[] = {
