@@ -5,6 +5,19 @@ package com.example.neeraj.buddyhub;
  */
 
 public class property {
+
+    public property(String house_image, String house_rent, String house_bhk, String house_colony, String house_bed) {
+        this.house_image = house_image;
+        this.house_rent = house_rent;
+        this.house_bhk = house_bhk;
+        this.house_colony = house_colony;
+        this.house_bed = house_bed;
+    }
+
+    public property() {
+
+    }
+
     public String getHouse_image() {
         return house_image;
     }

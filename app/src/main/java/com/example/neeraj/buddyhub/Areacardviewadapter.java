@@ -64,7 +64,7 @@ public class Areacardviewadapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     exception.printStackTrace();
                 }
             });
-            builder.build().load(Properties.get(position).getHouse_image()).fit().centerCrop().skipMemoryCache().placeholder(R.drawable.ppp).into(userViewHolder.house_image);
+            builder.build().load(Properties.get(position).getHouse_image()).fit().centerCrop().placeholder(R.drawable.ppp).into(userViewHolder.house_image);
         }
         else{
             LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
@@ -73,13 +73,21 @@ public class Areacardviewadapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-       TextView house_bhk;
+        TextView house_bhk;
         ImageView house_image;
+        TextView house_id;
+        TextView house_sector;
+        TextView house_beds;
+        TextView house_rent;
         private RecyclerViewCardClickListener mlistener;
         public UserViewHolder(View itemView,RecyclerViewCardClickListener listener) {
             super(itemView);
             house_bhk = (TextView)itemView.findViewById(R.id.house_bhk);
             house_image = (ImageView)itemView.findViewById(R.id.img_home);
+            house_id = (TextView)itemView.findViewById(R.id.house_id);
+            house_sector = (TextView) itemView.findViewById(R.id.house_sector);
+            house_beds = (TextView)itemView.findViewById(R.id.house_beds);
+            house_rent = (TextView) itemView.findViewById(R.id.house_rent);
             mlistener=listener;
             itemView.setOnClickListener(this);
         }

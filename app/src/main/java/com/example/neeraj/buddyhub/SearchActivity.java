@@ -10,6 +10,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class SearchActivity extends AppCompatActivity {
@@ -45,10 +51,50 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Gson gson = new Gson();
+        RecycleViewDataRequestObject recycleViewDataRequestObject=new RecycleViewDataRequestObject();
+        recycleViewDataRequestObject.setCity("alwar");
+        recycleViewDataRequestObject.setPageNo(1);
+        JSONObject jsonObject=new JSONObject();
+        JSONArray jsonArray=new JSONArray();
+
+        int i=0;
+        while( i<4){
+            JSONObject jsonObject1=new JSONObject();
+            try {
+                jsonObject1.put("house_image", "https://api.learn2crack.com/android/images/donut.png");
+                jsonObject1.put("house_rent","2000");
+                jsonObject1.put("house_bhk","2");
+                jsonObject1.put("house_colony","aaa");
+                jsonObject1.put("house_bed","1");
+                jsonArray.put(jsonObject1);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            i++;
+        }
+        try {
+            jsonObject.put("pageNo",1);
+            jsonObject.put("totalPages",5);
+            jsonObject.put("totalResults",100);
+            jsonObject.put("results",jsonArray);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        SearchResponse searchResponse=new SearchResponse();
+        searchResponse=gson.fromJson(String.valueOf(jsonObject), SearchResponse.class);
+        final ArrayList<property> results=searchResponse.getResults();
+        /*String json = gson.toJson(recycleViewDataRequestObject);
+        recycleViewDataRequestObject = gson.fromJson(json, RecycleViewDataRequestObject.class);
+        Log.i("GSON", "BACK TO MODEL OBJECT ->FirstName : " + recycleViewDataRequestObject.getCity() + ",LastName : " + recycleViewDataRequestObject.getPageNo());*/
+
         setContentView(R.layout.activity_search);
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.card_recycler_view);
         recyclerView.setHasFixedSize(true);
-        final ArrayList property = prepareData();
+        //final ArrayList property = prepareData();
         LinearLayoutManager layoutManager=new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(80));
@@ -61,7 +107,7 @@ public class SearchActivity extends AppCompatActivity {
              startActivity(intent);
          }
           };
-        final Areacardviewadapter areacardviewadapter=new Areacardviewadapter(getApplicationContext(),property,recyclerViewCardClickListener);
+        final Areacardviewadapter areacardviewadapter=new Areacardviewadapter(getApplicationContext(),results,recyclerViewCardClickListener);
       // areacardviewadapter.set
         recyclerView.setAdapter(areacardviewadapter);
         recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {
@@ -73,17 +119,17 @@ public class SearchActivity extends AppCompatActivity {
                     EndlessScrollListener.isloading = true;
 
                     Handler mHandler = new Handler();
-                    property.add(null);
-                    areacardviewadapter.notifyItemInserted(property.size()-1);
+                    results.add(null);
+                    areacardviewadapter.notifyItemInserted(results.size()-1);
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             property propertyObj = new property();
-                            property.remove(property.size()-1);
+                            results.remove(results.size()-1);
                             for(int j=0;j<3;j++){
                                 propertyObj.setHouse_image("https://api.learn2crack.com/android/images/donut.png");
                                 propertyObj.setHouse_bhk("aaa");
-                                property.add(propertyObj);
+                                results.add(propertyObj);
                             }
 
 
@@ -93,7 +139,7 @@ public class SearchActivity extends AppCompatActivity {
                                 public void run() {
                                     final int curSize=areacardviewadapter.getItemCount();
 
-                                    areacardviewadapter.notifyItemRangeInserted(curSize, property.size() - 1);
+                                    areacardviewadapter.notifyItemRangeInserted(curSize, results.size() - 1);
                                     EndlessScrollListener.isloading = false;
                                 }
                             });
@@ -109,12 +155,13 @@ public class SearchActivity extends AppCompatActivity {
     });
     }
     private ArrayList prepareData(){
-
+        JSONArray jsonArray=new JSONArray();
         ArrayList property = new ArrayList<>();
         for(int i=0;i<city_names.length;i++){
             property propertyObj = new property();
             propertyObj.setHouse_image(city_image_urls[i]);
             propertyObj.setHouse_bhk(city_names[i]);
+
             property.add(propertyObj);
         }
         return property;

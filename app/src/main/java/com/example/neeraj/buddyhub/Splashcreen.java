@@ -29,16 +29,20 @@ public class Splashcreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splashcreen);
+        Showprogressbar();
+     }
 
+    public void Showprogressbar(){
         progressBar=(ProgressBar)findViewById(R.id.progressBar3);
         progressBar.setVisibility(View.VISIBLE);
+
         if(isWorkingInternetPersent()){
             new Handler().postDelayed(new Runnable(){
                 @Override
                 public void run() {
 
                 /* Create an Intent that will start the Menu-Activity. */
-                progressBar.setVisibility(View.INVISIBLE);
+                    progressBar.setVisibility(View.INVISIBLE);
                     Intent mainIntent = new Intent(Splashcreen.this,MainActivity.class);
                     startActivity(mainIntent);
                     finish();
@@ -46,15 +50,19 @@ public class Splashcreen extends AppCompatActivity {
             }, 3000);
         }
         else{
-            progressBar.setVisibility(View.INVISIBLE);
-            showAlertDialog(this, "Internet Connection",
-                    "You don't have internet connection", false);
+            new Handler().postDelayed(new Runnable(){
+                @Override
+                public void run() {
+
+                    progressBar.setVisibility(View.INVISIBLE);
+                    showAlertDialog(Splashcreen.this, "Internet Connection",
+                            "You don't have internet connection", false);
+                }
+            }, 3000);
+
         }
-
-
-
-
     }
+
     public void showAlertDialog(Context context, String title, String message, Boolean status){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
@@ -66,7 +74,13 @@ public class Splashcreen extends AppCompatActivity {
                         finish();
                         System.exit(0);
                     }
-                });
+                }).setNegativeButton("Retry",new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Showprogressbar();
+            }
+        });
         AlertDialog alert = builder.create();
         alert.show();
 
